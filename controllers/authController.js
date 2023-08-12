@@ -51,6 +51,22 @@ exports.register = [
 
         await user.save();
 
-        res.status(200).json({ message: "Register successful" });
+        const token = generateAccessToken(user._id);
+
+        res.status(200).json({ message: "Register successful", user, token });
     }),
 ];
+
+exports.login = asyncHandler(async (req, res, next) => {
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) return res.status(401).json({ message: "Invalid email or password" });
+
+    const validPassword = await bcrypt.compare(req.body.password, user.password);
+
+    if (!validPassword) return res.status(401).json({ message: "Invalid email or password" });
+
+    const token = generateAccessToken(user._id);
+
+    res.status(200).json({ message: "Login successful", user, token });
+});

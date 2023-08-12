@@ -28,6 +28,9 @@ mongoose
         debug(err);
     });
 
+// passport config
+require("./helpers/passportConfig");
+
 // middleware and static files
 app.use(
     cors({
