@@ -61,11 +61,13 @@ exports.update = asyncHandler(async (req, res) => {
 
     if (!req.user._id.equals(room.admin)) return res.sendStatus(403);
 
-    await Room.findByIdAndUpdate(id, req.body);
+    const newRoom = await Room.findByIdAndUpdate(id, req.body, {
+        new: true,
+    });
 
     const data = {
         message: "Room updated successfully",
-        room,
+        room: newRoom,
     };
 
     debug(data);
