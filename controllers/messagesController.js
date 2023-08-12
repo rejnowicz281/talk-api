@@ -16,6 +16,8 @@ exports.create = asyncHandler(async (req, res) => {
 
     if (!room) throw new Error("Room not found");
 
+    if (!room.chatters.includes(req.user._id)) return res.sendStatus(403);
+
     room.messages.push(message);
 
     await room.save();
