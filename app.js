@@ -12,6 +12,7 @@ const cors = require("cors");
 const app = express();
 
 const authRouter = require("./routes/auth");
+const userRouter = require("./routes/users");
 
 // connect to mongodb && listen for requests
 const URI = process.env.MONGOD_URI;
@@ -53,6 +54,7 @@ app.get("/", (req, res) => {
     res.send("Hello World");
 });
 app.use(authRouter);
+app.use("/users", userRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
