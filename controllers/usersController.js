@@ -4,9 +4,9 @@ const User = require("../models/user");
 const asyncHandler = require("../asyncHandler");
 
 exports.show = asyncHandler(async (req, res) => {
-    const id = req.params.id;
+    const username = req.params.username;
 
-    const user = await User.findById(id);
+    const user = await User.findOne({ username });
 
     if (!user) throw new Error("User not found");
 
