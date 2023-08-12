@@ -59,7 +59,7 @@ exports.destroy = asyncHandler(async (req, res) => {
 
     if (!room) throw new Error("Room not found");
 
-    if (!req.user._id.equals(room.admin)) return res.sendStatus(401);
+    if (!req.user._id.equals(room.admin)) return res.sendStatus(403);
 
     await Room.findByIdAndDelete(id);
 
