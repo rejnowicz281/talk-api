@@ -13,6 +13,7 @@ const app = express();
 
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/users");
+const roomRouter = require("./routes/rooms");
 
 // connect to mongodb && listen for requests
 const URI = process.env.MONGOD_URI;
@@ -55,6 +56,7 @@ app.get("/", (req, res) => {
 });
 app.use(authRouter);
 app.use("/users", userRouter);
+app.use("/rooms", roomRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
