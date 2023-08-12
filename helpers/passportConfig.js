@@ -11,7 +11,7 @@ passport.use(
         },
         async (payload, done) => {
             try {
-                const user = await User.findById(payload.userId);
+                const user = await User.findById(payload.sub);
 
                 if (user) {
                     return done(null, user);
