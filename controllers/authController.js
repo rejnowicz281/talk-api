@@ -51,9 +51,9 @@ exports.register = [
 
         await user.save();
 
-        const token = generateAccessToken(user._id);
+        const token = generateAccessToken(user);
 
-        res.status(200).json({ message: "Register successful", user, token });
+        res.status(200).json({ message: "Register successful", token });
     }),
 ];
 
@@ -66,7 +66,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 
     if (!validPassword) return res.status(401).json({ message: "Invalid email or password" });
 
-    const token = generateAccessToken(user._id);
+    const token = generateAccessToken(user);
 
-    res.status(200).json({ message: "Login successful", user, token });
+    res.status(200).json({ message: "Login successful", token });
 });
