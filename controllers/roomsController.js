@@ -51,3 +51,23 @@ exports.create = asyncHandler(async (req, res) => {
     debug(data);
     res.json(data);
 });
+
+exports.destroy = asyncHandler(async (req, res) => {
+    const id = req.params.id;
+
+    const room = await Room.findById(id);
+
+    if (!room) throw new Error("Room not found");
+
+    if (!req.user._id.equals(room.admin)) return res.sendStatus(401);
+
+    await Room.findByIdAndDelete(id);
+
+    const data = {
+        message: "Room destroyed successfully",
+        roomId: id,
+    };
+
+    debug(data);
+    res.json(data);
+});
