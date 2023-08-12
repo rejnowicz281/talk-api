@@ -52,6 +52,26 @@ exports.create = asyncHandler(async (req, res) => {
     res.json(data);
 });
 
+exports.update = asyncHandler(async (req, res) => {
+    const id = req.params.id;
+
+    const room = await Room.findById(id);
+
+    if (!room) throw new Error("Room not found");
+
+    if (!req.user._id.equals(room.admin)) return res.sendStatus(403);
+
+    await Room.findByIdAndUpdate(id, req.body);
+
+    const data = {
+        message: "Room updated successfully",
+        room,
+    };
+
+    debug(data);
+    res.json(data);
+});
+
 exports.destroy = asyncHandler(async (req, res) => {
     const id = req.params.id;
 
