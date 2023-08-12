@@ -31,3 +31,32 @@ exports.create = asyncHandler(async (req, res) => {
     debug(data);
     res.json(data);
 });
+
+exports.destroy = asyncHandler(async (req, res) => {
+    const roomId = req.params.roomId;
+
+    const room = await Room.findById(roomId);
+
+    if (!room) throw new Error("Room not found");
+
+    const id = req.params.id;
+
+    if (!room.messages.id(id)) throw new Error("Message not found");
+
+    const message = room.messages.id(id);
+
+    if (!req.user._id.equals(message.user) && !req.user._id.equals(room.admin)) return res.sendStatus(403);
+
+    room.messages.pull(id);
+
+    await room.save();
+
+    const data = {
+        message: "Message destroyed successfully",
+        roomId,
+        messageBody: message,
+    };
+
+    debug(data);
+    res.json(data);
+});
