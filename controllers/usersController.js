@@ -1,6 +1,8 @@
 const debug = require("debug")("app:usersController");
 
 const User = require("../models/user");
+const Room = require("../models/room");
+
 const asyncHandler = require("../asyncHandler");
 
 exports.show = asyncHandler(async (req, res) => {
@@ -10,8 +12,12 @@ exports.show = asyncHandler(async (req, res) => {
 
     if (!user) throw new Error("User not found");
 
+    const rooms = await Room.find({ chatters: user._id }).select("name admin").populate("admin", "username");
+
     const userData = {
+        _id: user._id,
         username: user.username,
+        chatterRooms: rooms,
     };
 
     const data = { message: "Show User successful", user: userData };
