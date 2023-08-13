@@ -30,7 +30,11 @@ exports.create = [
 
         if (!room) throw new Error("Room not found");
 
-        if (!room.chatters.includes(req.user._id)) return res.sendStatus(403);
+        if (!room.chatters.includes(req.user._id)) {
+            const error = new Error("You are not authorized to send messages in this room");
+            error.status = 403;
+            throw error;
+        }
 
         await Room.updateOne({ _id: roomId }, { $push: { messages: message } });
 
@@ -58,7 +62,11 @@ exports.destroy = asyncHandler(async (req, res) => {
 
     const message = room.messages.id(id);
 
-    if (!req.user._id.equals(message.user) && !req.user._id.equals(room.admin)) return res.sendStatus(403);
+    if (!req.user._id.equals(message.user) && !req.user._id.equals(room.admin)) {
+        const error = new Error("You are not authorized to delete this message");
+        error.status = 403;
+        throw error;
+    }
 
     await Room.updateOne({ _id: roomId }, { $pull: { messages: { _id: id } } });
 
