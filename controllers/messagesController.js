@@ -18,9 +18,7 @@ exports.create = asyncHandler(async (req, res) => {
 
     if (!room.chatters.includes(req.user._id)) return res.sendStatus(403);
 
-    room.messages.push(message);
-
-    await room.save();
+    await Room.updateOne({ _id: roomId }, { $push: { messages: message } });
 
     const data = {
         message: "Message created",
@@ -47,9 +45,7 @@ exports.destroy = asyncHandler(async (req, res) => {
 
     if (!req.user._id.equals(message.user) && !req.user._id.equals(room.admin)) return res.sendStatus(403);
 
-    room.messages.pull(id);
-
-    await room.save();
+    await Room.updateOne({ _id: roomId }, { $pull: { messages: { _id: id } } });
 
     const data = {
         message: "Message destroyed successfully",
