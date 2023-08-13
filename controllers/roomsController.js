@@ -3,6 +3,8 @@ const debug = require("debug")("app:roomsController");
 const Room = require("../models/room");
 const asyncHandler = require("../asyncHandler");
 
+const { body, validationResult } = require("express-validator");
+
 exports.index = asyncHandler(async (req, res) => {
     const rooms = await Room.find().sort({ createdAt: -1 });
 
@@ -35,44 +37,70 @@ exports.show = asyncHandler(async (req, res) => {
     res.json(data);
 });
 
-exports.create = asyncHandler(async (req, res) => {
-    const room = new Room(req.body);
+exports.create = [
+    body("name")
+        .trim()
+        .isLength({ min: 1 })
+        .escape()
+        .withMessage("Name is required")
+        .isLength({ max: 50 })
+        .withMessage("Name is too long"),
+    asyncHandler(async (req, res) => {
+        const errors = validationResult(req);
 
-    room.admin = req.user._id;
-    room.chatters.push(req.user._id);
+        if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });
 
-    await room.save();
+        const room = new Room(req.body);
 
-    const data = {
-        message: "Room create successful",
-        room,
-    };
+        room.admin = req.user._id;
+        room.chatters.push(req.user._id);
 
-    debug(data);
-    res.json(data);
-});
+        await room.save();
 
-exports.update = asyncHandler(async (req, res) => {
-    const id = req.params.id;
+        const data = {
+            message: "Room create successful",
+            room,
+        };
 
-    const room = await Room.findById(id);
+        debug(data);
+        res.json(data);
+    }),
+];
 
-    if (!room) throw new Error("Room not found");
+exports.update = [
+    body("name")
+        .trim()
+        .isLength({ min: 1 })
+        .escape()
+        .withMessage("Name is required")
+        .isLength({ max: 50 })
+        .withMessage("Name is too long"),
+    asyncHandler(async (req, res) => {
+        const errors = validationResult(req);
 
-    if (!req.user._id.equals(room.admin)) return res.sendStatus(403);
+        if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });
 
-    const newRoom = await Room.findByIdAndUpdate(id, req.body, {
-        new: true,
-    });
+        const id = req.params.id;
 
-    const data = {
-        message: "Room updated successfully",
-        room: newRoom,
-    };
+        const room = await Room.findById(id);
 
-    debug(data);
-    res.json(data);
-});
+        if (!room) throw new Error("Room not found");
+
+        if (!req.user._id.equals(room.admin)) return res.sendStatus(403);
+
+        const newRoom = await Room.findByIdAndUpdate(id, req.body, {
+            new: true,
+        });
+
+        const data = {
+            message: "Room updated successfully",
+            room: newRoom,
+        };
+
+        debug(data);
+        res.json(data);
+    }),
+];
 
 exports.destroy = asyncHandler(async (req, res) => {
     const id = req.params.id;
