@@ -42,13 +42,21 @@ exports.destroy = asyncHandler(async (req, res, next) => {
 
     if (!room) throw new Error("Room not found");
 
-    if (!room.chatters.includes(req.user._id)) {
+    const id = req.params.id;
+
+    if (!req.user._id.equals(id) && !req.user._id.equals(room.admin)) {
+        const error = new Error("You can't remove other users");
+        error.status = 403;
+        throw error;
+    }
+
+    if (!room.chatters.includes(id)) {
         const error = new Error("User not in room");
         error.status = 400;
         throw error;
     }
 
-    if (room.admin.equals(req.user._id)) {
+    if (room.admin.equals(id)) {
         const error = new Error("Admin can't leave the room");
         error.status = 400;
         throw error;
