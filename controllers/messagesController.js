@@ -4,31 +4,46 @@ const Room = require("../models/room");
 const Message = require("../models/message");
 const asyncHandler = require("../asyncHandler");
 
-exports.create = asyncHandler(async (req, res) => {
-    const roomId = req.params.roomId;
+const { body, validationResult } = require("express-validator");
 
-    const message = new Message({
-        text: req.body.text,
-        user: req.user._id,
-    });
+exports.create = [
+    body("text")
+        .trim()
+        .isLength({ min: 1 })
+        .escape()
+        .withMessage("Text is required")
+        .isLength({ max: 160 })
+        .withMessage("Message is too long"),
+    asyncHandler(async (req, res) => {
+        const errors = validationResult(req);
 
-    const room = await Room.findById(roomId);
+        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    if (!room) throw new Error("Room not found");
+        const roomId = req.params.roomId;
 
-    if (!room.chatters.includes(req.user._id)) return res.sendStatus(403);
+        const message = new Message({
+            text: req.body.text,
+            user: req.user._id,
+        });
 
-    await Room.updateOne({ _id: roomId }, { $push: { messages: message } });
+        const room = await Room.findById(roomId);
 
-    const data = {
-        message: "Message created",
-        roomId,
-        message,
-    };
+        if (!room) throw new Error("Room not found");
 
-    debug(data);
-    res.json(data);
-});
+        if (!room.chatters.includes(req.user._id)) return res.sendStatus(403);
+
+        await Room.updateOne({ _id: roomId }, { $push: { messages: message } });
+
+        const data = {
+            message: "Message created",
+            roomId,
+            message,
+        };
+
+        debug(data);
+        res.json(data);
+    }),
+];
 
 exports.destroy = asyncHandler(async (req, res) => {
     const roomId = req.params.roomId;
