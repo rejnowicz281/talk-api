@@ -65,7 +65,7 @@ exports.destroy = asyncHandler(async (req, res, next) => {
     const newRoom = await Room.findByIdAndUpdate(
         roomId,
         {
-            $pull: { chatters: req.user._id },
+            $pull: { chatters: id },
         },
         { new: true }
     );
