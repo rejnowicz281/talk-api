@@ -6,7 +6,7 @@ const asyncHandler = require("../asyncHandler");
 const { body, validationResult } = require("express-validator");
 
 exports.index = asyncHandler(async (req, res) => {
-    const rooms = await Room.find().sort({ createdAt: -1 });
+    const rooms = await Room.find().sort({ createdAt: -1 }).select("name admin").populate("admin", "username");
 
     const data = {
         message: "Room index successful",
@@ -20,7 +20,10 @@ exports.index = asyncHandler(async (req, res) => {
 exports.show = asyncHandler(async (req, res) => {
     const id = req.params.id;
 
-    const room = await Room.findById(id);
+    const room = await Room.findById(id)
+        .populate("admin", "username")
+        .populate("chatters", "username")
+        .populate("messages.user", "username");
 
     if (!room) throw new Error("Room not found");
 
