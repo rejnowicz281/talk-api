@@ -41,7 +41,7 @@ exports.create = [
         const data = {
             message: "Message created",
             roomId,
-            message,
+            messageBody: message,
         };
 
         debug(data);
