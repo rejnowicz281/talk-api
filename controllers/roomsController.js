@@ -28,7 +28,7 @@ exports.show = asyncHandler(async (req, res) => {
     if (!room) throw new Error("Room not found");
 
     room.messages.sort((a, b) => {
-        return b.createdAt - a.createdAt;
+        return a.createdAt - b.createdAt;
     });
 
     const data = {
