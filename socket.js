@@ -32,6 +32,11 @@ exports.initSocket = function (server) {
             debug("user left room", room);
         });
 
+        socket.on("updateRoom", (roomId, name) => {
+            debug("update room", roomId, "with new name", name);
+            io.emit("updateRoom", roomId, name);
+        });
+
         // Room
         socket.on("createRoom", (room) => {
             debug("create room", room);
