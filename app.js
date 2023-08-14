@@ -15,6 +15,7 @@ const authRouter = require("./routes/auth");
 const userRouter = require("./routes/users");
 const roomRouter = require("./routes/rooms");
 
+const { initSocket } = require("./socket");
 // connect to mongodb && listen for requests
 const URI = process.env.MONGOD_URI;
 
@@ -23,6 +24,7 @@ mongoose
     .then(() => {
         const server = app.listen(3000);
 
+        initSocket(server);
         debug("Connected to DB");
         debug(server.address());
     })
