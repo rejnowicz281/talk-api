@@ -21,10 +21,10 @@ exports.create = [
 
         const roomId = req.params.roomId;
 
-        const message = new Message({
+        const message = await new Message({
             text: req.body.text,
             user: req.user._id,
-        });
+        }).populate("user", "username");
 
         const room = await Room.findById(roomId);
 

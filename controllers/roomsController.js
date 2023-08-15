@@ -53,10 +53,11 @@ exports.create = [
 
         if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });
 
-        const room = new Room(req.body);
-
-        room.admin = req.user._id;
-        room.chatters.push(req.user._id);
+        const room = await new Room({
+            ...req.body,
+            admin: req.user._id,
+            chatters: [req.user._id],
+        }).populate("admin", "username");
 
         await room.save();
 
