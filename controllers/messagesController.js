@@ -24,7 +24,7 @@ exports.create = [
         const message = await new Message({
             text: req.body.text,
             user: req.user._id,
-        }).populate("user", "username");
+        }).populate("user", "username avatar");
 
         const room = await Room.findById(roomId);
 

@@ -12,7 +12,7 @@ exports.show = asyncHandler(async (req, res) => {
 
     if (!user) throw new Error("User not found");
 
-    const rooms = await Room.find({ chatters: user._id }).select("name admin").populate("admin", "username");
+    const rooms = await Room.find({ chatters: user._id }).select("name admin");
 
     const userData = {
         _id: user._id,
