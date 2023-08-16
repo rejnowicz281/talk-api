@@ -8,6 +8,7 @@ const helmet = require("helmet");
 const createError = require("http-errors");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const fileupload = require("express-fileupload");
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use(
     })
 );
 app.use(compression());
+app.use(fileupload());
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

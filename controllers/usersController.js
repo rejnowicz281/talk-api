@@ -17,6 +17,7 @@ exports.show = asyncHandler(async (req, res) => {
     const userData = {
         _id: user._id,
         username: user.username,
+        avatar: user.avatar,
         chatterRooms: rooms,
     };
 

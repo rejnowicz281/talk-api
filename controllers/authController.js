@@ -3,6 +3,7 @@ const debug = require("debug")("app:authController");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const asyncHandler = require("../asyncHandler");
+const imagekit = require("../imagekit");
 
 const { body, validationResult } = require("express-validator");
 
@@ -39,12 +40,35 @@ exports.register = [
 
         if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });
 
+        let avatar;
+
+        if (req.files && req.files.avatar) {
+            const result = await imagekit.upload({
+                file: req.files.avatar.data,
+                fileName: req.files.avatar.name,
+                folder: "/talk/avatars",
+            });
+            const url = imagekit.url({
+                src: result.url,
+                transformation: [
+                    {
+                        height: 100,
+                        width: 100,
+                        crop: "fill",
+                    },
+                ],
+            });
+            debug("avatar url:", url);
+            avatar = url;
+        }
+
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
         const userData = {
             email: req.body.email,
             password: hashedPassword,
             username: req.body.username,
+            avatar: avatar || process.env.DEFAULT_AVATAR_URL,
         };
 
         const user = new User(userData);
