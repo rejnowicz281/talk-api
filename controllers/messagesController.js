@@ -10,7 +10,6 @@ exports.create = [
     body("text")
         .trim()
         .isLength({ min: 1 })
-        .escape()
         .withMessage("Text is required")
         .isLength({ max: 160 })
         .withMessage("Message is too long"),

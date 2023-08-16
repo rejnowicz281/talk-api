@@ -11,7 +11,6 @@ exports.register = [
     body("email")
         .trim()
         .isLength({ min: 1 })
-        .escape()
         .withMessage("Email must not be empty")
         .isEmail()
         .withMessage("Email must be a valid email address")
@@ -23,14 +22,13 @@ exports.register = [
     body("username")
         .trim()
         .isLength({ min: 1 })
-        .escape()
         .withMessage("Username must not be empty")
         .custom(async (value) => {
             const user = await User.findOne({ username: value });
             if (user) throw new Error("Username already in use");
             return true;
         }),
-    body("password", "Password must not be empty").trim().isLength({ min: 1 }).escape(),
+    body("password", "Password must not be empty").trim().isLength({ min: 1 }),
     body("password_confirm").custom((value, { req }) => {
         if (value !== req.body.password) throw new Error("Passwords do not match");
         return true;

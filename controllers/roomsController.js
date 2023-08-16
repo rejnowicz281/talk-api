@@ -44,7 +44,6 @@ exports.create = [
     body("name")
         .trim()
         .isLength({ min: 1 })
-        .escape()
         .withMessage("Name is required")
         .isLength({ max: 50 })
         .withMessage("Name is too long"),
@@ -75,7 +74,6 @@ exports.update = [
     body("name")
         .trim()
         .isLength({ min: 1 })
-        .escape()
         .withMessage("Name is required")
         .isLength({ max: 50 })
         .withMessage("Name is too long"),
