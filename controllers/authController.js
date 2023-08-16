@@ -54,7 +54,7 @@ exports.register = [
                     {
                         height: 100,
                         width: 100,
-                        crop: "fill",
+                        crop: "force",
                     },
                 ],
             });
