@@ -3,6 +3,7 @@ const debug = require("debug")("app:messagesController");
 const Room = require("../models/room");
 const Message = require("../models/message");
 const asyncHandler = require("../asyncHandler");
+const imagekit = require("../imagekit");
 
 const { body, validationResult } = require("express-validator");
 
@@ -18,12 +19,34 @@ exports.create = [
 
         if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-        const roomId = req.params.roomId;
+        let photo;
+
+        if (req.files && req.files.photo) {
+            const result = await imagekit.upload({
+                file: req.files.photo.data,
+                fileName: req.files.photo.name,
+                folder: "/talk/messages",
+            });
+            const url = imagekit.url({
+                src: result.url,
+                transformation: [
+                    {
+                        width: 400,
+                        aspectRatio: "4/3",
+                    },
+                ],
+            });
+            debug("photo url:", url);
+            photo = url;
+        }
 
         const message = await new Message({
             text: req.body.text,
             user: req.user._id,
+            photo,
         }).populate("user", "username avatar");
+
+        const roomId = req.params.roomId;
 
         const room = await Room.findById(roomId);
 
