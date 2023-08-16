@@ -19,7 +19,7 @@ exports.create = [
 
         if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-        let photo;
+        let photo = {};
 
         if (req.files && req.files.photo) {
             const result = await imagekit.upload({
@@ -27,6 +27,7 @@ exports.create = [
                 fileName: req.files.photo.name,
                 folder: "/talk/messages",
             });
+            debug("photo upload result:", result);
             const url = imagekit.url({
                 src: result.url,
                 transformation: [
@@ -37,7 +38,8 @@ exports.create = [
                 ],
             });
             debug("photo url:", url);
-            photo = url;
+            photo.url = url;
+            photo.fileId = result.fileId;
         }
 
         const message = await new Message({
@@ -88,6 +90,17 @@ exports.destroy = asyncHandler(async (req, res) => {
         const error = new Error("You are not authorized to delete this message");
         error.status = 403;
         throw error;
+    }
+
+    if (message.photo) {
+        imagekit
+            .deleteFile(message.photo.fileId)
+            .then((result) => {
+                debug(`ImageKit: Image ${message.photo.fileId} deleted`);
+            })
+            .catch((error) => {
+                debug(error);
+            });
     }
 
     await Room.updateOne({ _id: roomId }, { $pull: { messages: { _id: id } } });

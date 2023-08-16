@@ -14,9 +14,7 @@ const messageSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "User",
         },
-        photo: {
-            type: String,
-        },
+        photo: { url: String, fileId: String },
     },
     {
         timestamps: { createdAt: true, updatedAt: false },
