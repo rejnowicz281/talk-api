@@ -3,6 +3,8 @@ const debug = require("debug")("app:socket");
 
 let io;
 
+const loggedUsers = [];
+
 exports.initSocket = function (server) {
     io = new Server(server, {
         cors: {
@@ -13,28 +15,39 @@ exports.initSocket = function (server) {
     io.on("connection", (socket) => {
         debug("a user connected");
 
-        socket.on("disconnect", () => {
-            debug("user disconnected");
-        });
-
         socket.on("testMessage", (message) => {
             debug("Server: Test Message");
             io.emit("testMessage", message);
         });
 
-        socket.on("joinRoom", (room) => {
-            socket.join(room);
-            debug("user joined room", room);
+        // Active users
+        socket.on("login", (user) => {
+            if (!loggedUsers.some((loggedUser) => loggedUser._id === user._id))
+                loggedUsers.push({ ...user, socketId: socket.id });
+
+            io.emit("updateLoggedUsers", loggedUsers);
         });
 
-        socket.on("leaveRoom", (room) => {
-            socket.leave(room);
-            debug("user left room", room);
+        socket.on("logout", (userId) => {
+            debug(`user ${userId} logged out`);
+            const index = loggedUsers.findIndex((loggedUser) => loggedUser._id === userId);
+            if (index > -1) loggedUsers.splice(index, 1);
+
+            io.emit("updateLoggedUsers", loggedUsers);
         });
 
-        socket.on("updateRoom", (roomId, name) => {
-            debug("update room", roomId, "with new name", name);
-            io.emit("updateRoom", roomId, name);
+        socket.on("updateLoggedUsers", (loggedUsers) => {
+            debug("update logged users", loggedUsers);
+            io.emit("updateLoggedUsers", loggedUsers);
+        });
+
+        socket.on("disconnect", () => {
+            debug("user disconnected");
+
+            const index = loggedUsers.findIndex((loggedUser) => loggedUser.socketId === socket.id);
+            if (index > -1) loggedUsers.splice(index, 1);
+
+            io.emit("updateLoggedUsers", loggedUsers);
         });
 
         // Room
@@ -46,6 +59,21 @@ exports.initSocket = function (server) {
         socket.on("removeRoom", (room) => {
             debug("remove room", room);
             io.emit("removeRoom", room);
+        });
+
+        socket.on("updateRoom", (roomId, name) => {
+            debug("update room", roomId, "with new name", name);
+            io.emit("updateRoom", roomId, name);
+        });
+
+        socket.on("joinRoom", (room) => {
+            socket.join(room);
+            debug("user joined room", room);
+        });
+
+        socket.on("leaveRoom", (room) => {
+            socket.leave(room);
+            debug("user left room", room);
         });
 
         // Room messages
