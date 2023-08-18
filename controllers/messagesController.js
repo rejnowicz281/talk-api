@@ -20,8 +20,7 @@ exports.create = [
         if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
         let photo = {};
-
-        if (req.files && req.files.photo) {
+        if (req.files && req.files.photo && req.files.photo.mimetype.startsWith("image")) {
             const result = await imagekit.upload({
                 file: req.files.photo.data,
                 fileName: req.files.photo.name,
