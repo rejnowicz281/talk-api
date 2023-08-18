@@ -15,11 +15,6 @@ exports.initSocket = function (server) {
     io.on("connection", (socket) => {
         debug("a user connected");
 
-        socket.on("testMessage", (message) => {
-            debug("Server: Test Message");
-            io.emit("testMessage", message);
-        });
-
         // Active users
         socket.on("login", (user) => {
             if (!loggedUsers.some((loggedUser) => loggedUser._id === user._id))
