@@ -55,7 +55,7 @@ exports.create = [
             ...req.body,
             admin: req.user._id,
             chatters: [req.user._id],
-        }).populate("admin", "username");
+        });
 
         await room.save();
 
