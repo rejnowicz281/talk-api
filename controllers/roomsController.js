@@ -21,7 +21,6 @@ exports.show = asyncHandler(async (req, res) => {
     const id = req.params.id;
 
     const room = await Room.findById(id)
-        .populate("admin", "username avatar")
         .populate("chatters", "username avatar")
         .populate("messages.user", "username avatar");
 
