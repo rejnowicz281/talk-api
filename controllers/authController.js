@@ -79,6 +79,25 @@ exports.register = [
     }),
 ];
 
+exports.demoLogin = asyncHandler(async (req, res, next) => {
+    let user = await User.findOne({ email: "demo@gmail.com" });
+
+    if (!user) {
+        debug("Demo user not found, creating new demo user...");
+        user = new User({
+            email: "demo@gmail.com",
+            password: 123,
+            username: "Demo User",
+            avatar: process.env.DEFAULT_AVATAR_URL,
+        });
+        await user.save();
+    }
+
+    const token = generateAccessToken(user);
+
+    res.status(200).json({ message: "Demo Login Successful", token });
+});
+
 exports.login = asyncHandler(async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
 
