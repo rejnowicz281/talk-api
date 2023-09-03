@@ -34,7 +34,7 @@ mongoose
     });
 
 // passport config
-require("./helpers/passportConfig");
+require("./passport");
 
 // middleware and static files
 app.use(

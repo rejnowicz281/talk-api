@@ -5,7 +5,7 @@ const router = express.Router({ mergeParams: true });
 
 const { create, destroy } = require("../controllers/chattersController");
 
-router.post("/join", passport.authenticate("jwt", { session: false }), create);
-router.delete("/:id", passport.authenticate("jwt", { session: false }), destroy);
+router.post("/join", passport.authenticate("jwtAccessToken", { session: false }), create);
+router.delete("/:id", passport.authenticate("jwtAccessToken", { session: false }), destroy);
 
 module.exports = router;

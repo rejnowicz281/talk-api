@@ -4,6 +4,7 @@ const JWTStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 
 passport.use(
+    "jwtAccessToken",
     new JWTStrategy(
         {
             secretOrKey: process.env.JWT_SECRET,

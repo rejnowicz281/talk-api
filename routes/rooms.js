@@ -9,10 +9,10 @@ const { update, destroy, index, show, create } = require("../controllers/roomsCo
 
 router.use("/:roomId/messages", messageRouter);
 router.use("/:roomId/chatters", chatterRouter);
-router.get("/", passport.authenticate("jwt", { session: false }), index);
-router.get("/:id", passport.authenticate("jwt", { session: false }), show);
-router.post("/", passport.authenticate("jwt", { session: false }), create);
-router.delete("/:id", passport.authenticate("jwt", { session: false }), destroy);
-router.put("/:id", passport.authenticate("jwt", { session: false }), update);
+router.get("/", passport.authenticate("jwtAccessToken", { session: false }), index);
+router.get("/:id", passport.authenticate("jwtAccessToken", { session: false }), show);
+router.post("/", passport.authenticate("jwtAccessToken", { session: false }), create);
+router.delete("/:id", passport.authenticate("jwtAccessToken", { session: false }), destroy);
+router.put("/:id", passport.authenticate("jwtAccessToken", { session: false }), update);
 
 module.exports = router;
