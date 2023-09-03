@@ -9,6 +9,7 @@ const createError = require("http-errors");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const fileupload = require("express-fileupload");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
@@ -39,12 +40,14 @@ require("./passport");
 // middleware and static files
 app.use(
     cors({
-        origin: ["http://localhost:5173"],
+        origin: ["https://rejnowicz281.github.io/talk", "http://localhost:5173"],
+        credentials: true,
     })
 );
 app.use(compression());
 app.use(fileupload());
 app.use(helmet());
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // app.use(

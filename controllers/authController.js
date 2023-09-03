@@ -1,4 +1,4 @@
-const generateAccessToken = require("../helpers/generateAccessToken");
+const { generateAccessToken, generateRefreshToken } = require("../helpers/generateTokens");
 const debug = require("debug")("app:authController");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
@@ -6,6 +6,7 @@ const asyncHandler = require("../asyncHandler");
 const imagekit = require("../imagekit");
 
 const { body, validationResult } = require("express-validator");
+const refreshTokenOptions = require("../helpers/refreshTokenOptions");
 
 exports.register = [
     body("email")
@@ -73,9 +74,12 @@ exports.register = [
 
         await user.save();
 
-        const token = generateAccessToken(user);
+        const refresh_token = generateRefreshToken(user._id);
+        const access_token = generateAccessToken(user);
 
-        res.status(200).json({ message: "Register successful", token });
+        res.cookie("refresh_token", refresh_token, refreshTokenOptions)
+            .status(200)
+            .json({ message: "Register Successful", access_token });
     }),
 ];
 
@@ -93,9 +97,12 @@ exports.demoLogin = asyncHandler(async (req, res, next) => {
         await user.save();
     }
 
-    const token = generateAccessToken(user);
+    const refresh_token = generateRefreshToken(user._id);
+    const access_token = generateAccessToken(user);
 
-    res.status(200).json({ message: "Demo Login Successful", token });
+    res.cookie("refresh_token", refresh_token, refreshTokenOptions)
+        .status(200)
+        .json({ message: "Demo Login Successful", access_token });
 });
 
 exports.login = asyncHandler(async (req, res, next) => {
@@ -107,7 +114,20 @@ exports.login = asyncHandler(async (req, res, next) => {
 
     if (!validPassword) return res.status(401).json({ message: "Invalid email or password" });
 
-    const token = generateAccessToken(user);
+    const refresh_token = generateRefreshToken(user._id);
+    const access_token = generateAccessToken(user);
 
-    res.status(200).json({ message: "Login successful", token });
+    res.cookie("refresh_token", refresh_token, refreshTokenOptions)
+        .status(200)
+        .json({ message: "Login successful", access_token });
 });
+
+exports.refresh = async (req, res, next) => {
+    const access_token = generateAccessToken(req.user);
+
+    res.status(200).json({ message: "Token refresh successful", access_token });
+};
+
+exports.logout = async (req, res, next) => {
+    res.clearCookie("refresh_token").status(200).json({ message: "Logout successful" });
+};
