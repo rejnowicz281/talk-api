@@ -40,7 +40,7 @@ require("./passport");
 // middleware and static files
 app.use(
     cors({
-        origin: ["https://rejnowicz281.github.io/talk", "http://localhost:5173"],
+        origin: ["https://rejnowicz281.github.io", "http://localhost:5173"],
         credentials: true,
     })
 );

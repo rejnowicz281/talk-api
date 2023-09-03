@@ -8,7 +8,7 @@ const loggedUsers = [];
 exports.initSocket = function (server) {
     io = new Server(server, {
         cors: {
-            origin: ["http://localhost:5173", "https://rejnowicz281.github.io/talk"],
+            origin: ["http://localhost:5173", "https://rejnowicz281.github.io"],
         },
     });
 
