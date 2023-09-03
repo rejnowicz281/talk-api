@@ -5,23 +5,25 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     email: {
         type: String,
-        required: true,
-        unique: true,
         trim: true,
     },
     password: {
         type: String,
-        required: true,
     },
     username: {
         type: String,
         required: true,
-        unique: true,
         trim: true,
     },
     avatar: {
         type: String,
         required: true,
+    },
+    provider: {
+        type: String,
+    },
+    subject: {
+        type: String,
     },
 });
 

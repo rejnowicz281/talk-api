@@ -2,3 +2,4 @@
 
 require("./jwtAccessToken");
 require("./jwtRefreshToken");
+require("./githubToken");
