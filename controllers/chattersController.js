@@ -1,6 +1,5 @@
-// create, destroy
 const debug = require("debug")("app:chattersController");
-
+const createError = require("http-errors");
 const Room = require("../models/room");
 const asyncHandler = require("../asyncHandler");
 
@@ -9,13 +8,9 @@ exports.create = asyncHandler(async (req, res, next) => {
 
     const room = await Room.findById(roomId);
 
-    if (!room) throw new Error("Room not found");
+    if (!room) throw createError(404, "Room not found");
 
-    if (room.chatters.includes(req.user._id)) {
-        const error = new Error("Chatter already in room");
-        error.status = 400;
-        throw error;
-    }
+    if (room.chatters.includes(req.user._id)) throw createError(400, "User already in room");
 
     const newRoom = await Room.findByIdAndUpdate(
         roomId,
@@ -40,27 +35,16 @@ exports.destroy = asyncHandler(async (req, res, next) => {
 
     const room = await Room.findById(roomId);
 
-    if (!room) throw new Error("Room not found");
+    if (!room) throw createError(404, "Room not found");
 
     const id = req.params.id;
 
-    if (!req.user._id.equals(id) && !req.user._id.equals(room.admin)) {
-        const error = new Error("You can't remove other users");
-        error.status = 403;
-        throw error;
-    }
+    if (!req.user._id.equals(id) && !req.user._id.equals(room.admin))
+        throw createError(403, "You can't remove other users");
 
-    if (!room.chatters.includes(id)) {
-        const error = new Error("User not in room");
-        error.status = 400;
-        throw error;
-    }
+    if (!room.chatters.includes(id)) throw createError(400, "User not in room");
 
-    if (room.admin.equals(id)) {
-        const error = new Error("Admin can't leave the room");
-        error.status = 400;
-        throw error;
-    }
+    if (room.admin.equals(id)) throw createError(400, "Admin can't leave the room");
 
     const newRoom = await Room.findByIdAndUpdate(
         roomId,

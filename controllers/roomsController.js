@@ -1,8 +1,7 @@
 const debug = require("debug")("app:roomsController");
-
 const Room = require("../models/room");
 const asyncHandler = require("../asyncHandler");
-
+const createError = require("http-errors");
 const { body, validationResult } = require("express-validator");
 
 exports.index = asyncHandler(async (req, res) => {
@@ -24,7 +23,7 @@ exports.show = asyncHandler(async (req, res) => {
         .populate("chatters", "username avatar")
         .populate("messages.user", "username avatar");
 
-    if (!room) throw new Error("Room not found");
+    if (!room) throw createError(404, "Room not found");
 
     room.messages.sort((a, b) => {
         return a.createdAt - b.createdAt;
@@ -85,13 +84,9 @@ exports.update = [
 
         const room = await Room.findById(id);
 
-        if (!room) throw new Error("Room not found");
+        if (!room) throw createError(404, "Room not found");
 
-        if (!req.user._id.equals(room.admin)) {
-            const error = new Error("You are not authorized to update this room");
-            error.status = 403;
-            throw error;
-        }
+        if (!req.user._id.equals(room.admin)) throw createError(403, "You are not authorized to update this room");
 
         const newRoom = await Room.findByIdAndUpdate(id, req.body, {
             new: true,
@@ -112,13 +107,9 @@ exports.destroy = asyncHandler(async (req, res) => {
 
     const room = await Room.findById(id);
 
-    if (!room) throw new Error("Room not found");
+    if (!room) throw createError(404, "Room not found");
 
-    if (!req.user._id.equals(room.admin)) {
-        const error = new Error("You are not authorized to delete this room");
-        error.status = 403;
-        throw error;
-    }
+    if (!req.user._id.equals(room.admin)) throw createError(403, "You are not authorized to delete this room");
 
     await Room.findByIdAndDelete(id);
 

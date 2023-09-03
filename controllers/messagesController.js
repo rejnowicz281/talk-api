@@ -1,10 +1,9 @@
 const debug = require("debug")("app:messagesController");
-
 const Room = require("../models/room");
 const Message = require("../models/message");
 const asyncHandler = require("../asyncHandler");
+const createError = require("http-errors");
 const imagekit = require("../imagekit");
-
 const { body, validationResult } = require("express-validator");
 
 exports.create = [
@@ -51,13 +50,10 @@ exports.create = [
 
         const room = await Room.findById(roomId);
 
-        if (!room) throw new Error("Room not found");
+        if (!room) throw createError(404, "Room not found");
 
-        if (!room.chatters.includes(req.user._id)) {
-            const error = new Error("You are not authorized to send messages in this room");
-            error.status = 403;
-            throw error;
-        }
+        if (!room.chatters.includes(req.user._id))
+            throw createError(403, "You are not authorized to send messages in this room");
 
         await Room.updateOne({ _id: roomId }, { $push: { messages: message } });
 
@@ -77,19 +73,16 @@ exports.destroy = asyncHandler(async (req, res) => {
 
     const room = await Room.findById(roomId);
 
-    if (!room) throw new Error("Room not found");
+    if (!room) throw createError(404, "Room not found");
 
     const id = req.params.id;
 
-    if (!room.messages.id(id)) throw new Error("Message not found");
+    if (!room.messages.id(id)) throw createError(404, "Message not found");
 
     const message = room.messages.id(id);
 
-    if (!req.user._id.equals(message.user) && !req.user._id.equals(room.admin)) {
-        const error = new Error("You are not authorized to delete this message");
-        error.status = 403;
-        throw error;
-    }
+    if (!req.user._id.equals(message.user) && !req.user._id.equals(room.admin))
+        throw createError(403, "You are not authorized to delete this message");
 
     if (message.photo) {
         imagekit

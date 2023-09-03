@@ -10,7 +10,7 @@ exports.show = asyncHandler(async (req, res) => {
 
     const user = await User.findOne({ username });
 
-    if (!user) throw new Error("User not found");
+    if (!user) throw createError(404, "User not found");
 
     const rooms = await Room.find({ chatters: user._id }).select("name admin").sort({ createdAt: -1 });
     const userData = {
